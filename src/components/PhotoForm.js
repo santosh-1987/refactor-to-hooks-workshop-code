@@ -1,8 +1,31 @@
-import React, { Component, createRef } from 'react';
+import React, { Component, createRef, useRef, useContext } from 'react';
 
-import { UserConsumer } from '../context';
+import { UserConsumer, UserContext } from '../context';
 
-class PhotoForm extends Component {
+function PhotoForm({ onSubmit }) {
+  const userContext = useContext(UserContext);
+  const inputRef = useRef();
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    const photoUrl = inputRef.current.value;
+    inputRef.current.value = '';
+
+    userContext.addPhoto(photoUrl);
+
+    onSubmit(event);
+  };
+
+  return (
+    <form className="photo-form" onSubmit={handleSubmit}>
+      <input type="url" placeholder="Paste Image Url" autoFocus required ref={inputRef} />
+      <button type="submit">Add</button>
+    </form>
+  );
+}
+
+class oldPhotoForm extends Component {
   inputRef = createRef();
 
   handleSubmit = (event, addPhoto) => {
@@ -20,10 +43,7 @@ class PhotoForm extends Component {
     return (
       <UserConsumer>
         {({ addPhoto }) => (
-          <form
-            className="photo-form"
-            onSubmit={event => this.handleSubmit(event, addPhoto)}
-          >
+          <form className="photo-form" onSubmit={event => this.handleSubmit(event, addPhoto)}>
             <input
               type="url"
               placeholder="Paste Image Url"
